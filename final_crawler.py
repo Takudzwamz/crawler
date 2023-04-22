@@ -23,9 +23,9 @@ ORANGE = colorama.Fore.LIGHTRED_EX
 MEROON = colorama.Fore.LIGHTMAGENTA_EX
 CYAN = colorama.Fore.CYAN
 
-seed_url = "https://msu.ru"  # ... your seed URL here
+seed_url = "https://spbu.ru"  # ... your seed URL here
 max_visits = 1000  # ... max number of pages to visit
-num_workers = 20 # ... number of workers to run in parallel
+num_workers = 20  # ... number of workers to run in parallel
 
 visited = set()
 internal_urls = set()
@@ -174,6 +174,7 @@ print("[+] Total External links:", len(external_urls))
 print("[+] Total Subdomains links:", len(subdomains))
 print("[+] Total Broken links:", len(broken_urls))
 print("[+] Total Document links:", len(document_urls))
+print("[+] Total links:", len(internal_urls) + len(external_urls) + len(subdomains) + len(broken_urls) + len(document_urls))
 
 
 # create folder for the website
