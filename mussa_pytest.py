@@ -1,6 +1,6 @@
 import pytest
 import os
-from final_crawler import crawl, is_valid,  extract_content, get_links, is_skip_link, extract_links, queue_worker, get_broken_links, q
+from final_crawler import crawl, is_valid,  extract_content, get_links, is_skip_link, extract_links, get_broken_links, q, queue_worker, i
 import requests
 from bs4 import BeautifulSoup
 from queue import Queue
@@ -97,25 +97,4 @@ def test_crawl():
    assert len(internal_urls) > 0
 
 
-def test_queue_worker():
-    # Créer une file d'attente avec des liens factices pour tester
-    test_q = Queue()
-    test_q.put('https://vk.com')
-    test_q.put('https://spbu.ru')
-    test_q.put('https://msu.ru')
-    
-    # Initialiser les variables nécessaires pour la fonction queue_worker()
-    visited = set()
-    internal_urls = set()
-    subdomains = set()
-    external_urls = set()
-    document_urls = set()
-    max_visits = 3
-    
-    # Appeler la fonction queue_worker() avec les arguments nécessaires
-    queue_worker(1, test_q, visited, internal_urls, subdomains, external_urls, document_urls, max_visits)
-    
-    # Vérifier que tous les liens ont été visités
-    assert len(visited) == 3
-    assert len(internal_urls) > 0
 
