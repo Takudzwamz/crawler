@@ -23,6 +23,7 @@ BLUE = colorama.Fore.BLUE
 CREAM = colorama.Fore.LIGHTYELLOW_EX
 ORANGE = colorama.Fore.LIGHTRED_EX
 MEROON = colorama.Fore.LIGHTMAGENTA_EX
+WHITE = colorama.Fore.WHITE
 
 url = "https://www.msu.ru"
 
@@ -140,6 +141,8 @@ async def process_urls(new_urls, max_visits):
         url = new_urls.popleft()
         await process_url(url, processed_urls, new_urls, total_urls_visited, broken_urls, document_urls, local_urls, subdomain_urls, foreign_urls)
         total_urls_visited += 1
+        print(
+            f"{WHITE}[+] Visited {total_urls_visited} out of {max_visits} URLs")
         if total_urls_visited >= max_visits:
             break
 
