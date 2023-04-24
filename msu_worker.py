@@ -33,13 +33,29 @@ headers = {
 async def process_url(url, processed_urls, new_urls, total_urls_visited, broken_urls, document_urls, local_urls, subdomain_urls, foreign_urls):
     processed_urls.add(url)
     total_urls_visited += 1
-    print(f"{YELLOW}[*] Crawling: {url}{RESET}")
-    try:
-        response = await asyncio.get_event_loop().run_in_executor(None, requests.get, url)
-    except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.InvalidURL, requests.exceptions.InvalidSchema):
-        print(f"{RED}[*] Broken link: {url}{RESET}")
-        broken_urls.add(url)
-        return
+    print(f"{YELLOW}[*] Now Crawling: {url}{RESET}")
+    # try:
+    #     response = await asyncio.get_event_loop().run_in_executor(None, requests.get, url)
+    # except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.InvalidURL, requests.exceptions.InvalidSchema):
+    #     print(f"{RED}[*] Broken link: {url}{RESET}")
+    #     broken_urls.add(url)
+    #     return
+    retries = 0
+    while True:
+        try:
+            response = await asyncio.get_event_loop().run_in_executor(None, requests.get, url)
+            break
+        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.InvalidURL, requests.exceptions.InvalidSchema, requests.exceptions.RequestException,  Exception, requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.HTTPError, requests.exceptions.URLRequired) as e:
+            if retries < 2:
+                retries += 1
+                print(
+                    f"{RED}[*] Failed to fetch {url}: {e}. Retrying ({retries}/2)...{RESET}")
+                await asyncio.sleep(1)
+                continue
+            else:
+                print(f"{RED}[*] Broken link: {url}{RESET}")
+                broken_urls.add(url)
+                return
 
     parts = urlsplit(url)
     base = "{0.netloc}".format(parts)
@@ -49,7 +65,24 @@ async def process_url(url, processed_urls, new_urls, total_urls_visited, broken_
 
     # soup = BeautifulSoup(response.content , "lxml")
     # create a beutiful soup for the html document
-    soup = BeautifulSoup(requests.get(url, headers=headers).content, "lxml")
+    try:
+        soup = BeautifulSoup(response.content, "lxml")
+    except Exception as e:
+        print(f"Could not parse {url}: {e}")
+        num_tries = 0
+        while num_tries < 2:
+            try:
+                soup = BeautifulSoup(requests.get(
+                    url, headers=headers).content, "lxml")
+                break
+            except (requests.exceptions.RequestException, Exception, requests.exceptions.Timeout, requests.exceptions.TooManyRedirects, requests.exceptions.ConnectionError, requests.exceptions.HTTPError, requests.exceptions.URLRequired) as e:
+                print(f"Could not fetch {url}: {e}")
+                broken_urls.add(url)
+                num_tries += 1
+                continue
+        # else:
+        #     broken_urls.add(url)
+        #     return
     # print(soup.prettify())
 
     for link in soup.find_all('a'):
@@ -136,7 +169,7 @@ if __name__ == "__main__":
     print("[+] Total Broken links:", len(broken_urls))
     print("[+] Total URLs found:", total_urls_visited)
     print("[+] Total Processed URLs:", len(processed_urls))
-    print(f"Number of unprocessed links: {len(new_urls)}")
+    print("[+]Number of unprocessed links:", len(new_urls))
 
     # create a report of all urls
     # create folder for the website

@@ -1,3 +1,4 @@
+
 import os
 from bs4 import BeautifulSoup
 import colorama
@@ -23,12 +24,11 @@ CREAM = colorama.Fore.LIGHTYELLOW_EX
 ORANGE = colorama.Fore.LIGHTRED_EX
 MEROON = colorama.Fore.LIGHTMAGENTA_EX
 
-url = "https://spbu.ru"
+url = "https://www.msu.ru"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
 }
-
 
 async def process_url(url, processed_urls, new_urls, total_urls_visited, broken_urls, document_urls, local_urls, subdomain_urls, foreign_urls):
     processed_urls.add(url)
@@ -85,7 +85,7 @@ async def process_url(url, processed_urls, new_urls, total_urls_visited, broken_
         #     broken_urls.add(url)
         #     return
     # print(soup.prettify())
-    
+
     for link in soup.find_all('a'):
         anchor = link.attrs["href"] if "href" in link.attrs else ''
 
@@ -151,7 +151,7 @@ async def process_urls(new_urls, max_visits):
 
 if __name__ == "__main__":
     new_urls = deque([url])
-    max_visits = 10000  # ... max number of pages to visit
+    max_visits = 10  # ... max number of pages to visit
     loop = asyncio.get_event_loop()
     try:
         processed_urls,broken_urls, document_urls, local_urls, subdomain_urls, foreign_urls = loop.run_until_complete(
